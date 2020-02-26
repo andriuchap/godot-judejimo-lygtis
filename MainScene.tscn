@@ -1,0 +1,142 @@
+[gd_scene load_steps=8 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends RigidBody2D
+
+func _ready():
+	apply_impulse(Vector2.ZERO, Vector2(250.0, -250.0))
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _physics_process(_delta):
+	#$HorizontalForce.scale.x = lerp($HorizontalForce.scale.x, linear_velocity.x/32.0, 0.25);
+	#$VerticalForce.scale.y = lerp($VerticalForce.scale.y, linear_velocity.y/32.0, 0.25);
+	#$TotalVelocity.scale.x = lerp($TotalVelocity.scale.x, linear_velocity.length()/32.0, 0.25);
+	
+	$HorizontalForce.scale.x = linear_velocity.x/32.0
+	$VerticalForce.scale.y = linear_velocity.y/32.0
+	$TotalVelocity.scale.x = linear_velocity.length()/32.0
+	
+	$TotalVelocity.rotation = -rotation + linear_velocity.angle();
+	$HorizontalForce.rotation = -rotation;
+	$VerticalForce.rotation = -rotation;
+"
+
+[sub_resource type="StreamTexture" id=2]
+flags = 4
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 64, 64 )
+
+[sub_resource type="PhysicsMaterial" id=4]
+friction = 0.25
+bounce = 1.0
+
+[sub_resource type="ConvexPolygonShape2D" id=5]
+points = PoolVector2Array( 256, 0, -256, 0, -256, -256 )
+
+[sub_resource type="PhysicsMaterial" id=6]
+friction = 0.5
+bounce = 1.0
+
+[sub_resource type="GDScript" id=7]
+script/source = "extends Line2D
+
+
+export(NodePath) var TrackingNode
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _physics_process(delta):
+	var node = get_node(TrackingNode);
+	add_point(node.global_position);
+"
+
+[node name="Root" type="Node2D"]
+
+[node name="Box" type="RigidBody2D" parent="."]
+position = Vector2( 109.778, 516.38 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="BoxSprite" type="Sprite" parent="Box"]
+scale = Vector2( 4, 4 )
+texture = SubResource( 2 )
+
+[node name="Shape" type="CollisionShape2D" parent="Box"]
+shape = SubResource( 3 )
+
+[node name="HorizontalForce" type="Sprite" parent="Box"]
+modulate = Color( 0.764706, 0.0745098, 0.0745098, 1 )
+scale = Vector2( 1, 0.1 )
+texture = SubResource( 2 )
+centered = false
+offset = Vector2( 0, -16 )
+
+[node name="VerticalForce" type="Sprite" parent="Box"]
+modulate = Color( 0.141176, 0.745098, 0.0666667, 1 )
+scale = Vector2( 0.1, 1 )
+texture = SubResource( 2 )
+centered = false
+offset = Vector2( -16, 0 )
+
+[node name="TotalVelocity" type="Sprite" parent="Box"]
+modulate = Color( 0.929412, 0.901961, 0.0196078, 1 )
+scale = Vector2( 1, 0.05 )
+texture = SubResource( 2 )
+centered = false
+offset = Vector2( 0, -16 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2( -80.8021, -374.836 )
+rotation = -0.454694
+scale = Vector2( 0.64, 1 )
+physics_material_override = SubResource( 4 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D"]
+polygon = PoolVector2Array( 256, 0, -256, 0, -256, -256 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource( 5 )
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+position = Vector2( 1181.44, -512.804 )
+rotation = -1.13464
+scale = Vector2( 0.64, 1 )
+physics_material_override = SubResource( 6 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D2"]
+polygon = PoolVector2Array( 256, 0, -256, 0, -256, -256 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+shape = SubResource( 5 )
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="."]
+position = Vector2( -483.627, -258.203 )
+rotation = 0.108713
+scale = Vector2( 0.64, 1 )
+physics_material_override = SubResource( 6 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D3"]
+polygon = PoolVector2Array( 256, 0, -256, 0, -256, -256 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
+shape = SubResource( 5 )
+
+[node name="Line2D" type="Line2D" parent="."]
+width = 1.0
+default_color = Color( 0.4, 0.407843, 1, 1 )
+joint_mode = 2
+script = SubResource( 7 )
+TrackingNode = NodePath("../Box")
